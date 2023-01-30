@@ -12,7 +12,7 @@
     "url": "git+https://github.com/EvaGraceSmith/city-explorer-api.git"
   },
   "author": "Eva Grace Smith",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/EvaGraceSmith/city-explorer-api/issues"
   },

@@ -42,7 +42,7 @@ app.get('/weather', (request, response)=>{
     // let dataToSend = data.find(city => city.cityname === cityName);
     console.log('did we find city name?', cityName, cityLat,cityLon);
     let dataToInstantiate = data.find(city => city.city_name === cityName); //&&
-       // city.citylat === cityLat && city.citylon === cityLon );
+    // city.citylat === cityLat && city.citylon === cityLon );
     if (dataToInstantiate === undefined){
       response.status(500).send('City not found');
     }
@@ -50,9 +50,11 @@ app.get('/weather', (request, response)=>{
       let dataToSend = new Forecast(dataToInstantiate);
       console.log(dataToSend, 'got back from weather class');
       let returnObject= [];
-      returnObject.push({'date':dataToSend.datetime});
-      returnObject.push({'description':`Low of ${dataToSend.lowTemp}, high of ${dataToSend.maxTemp} with ${dataToSend.description}`});
-      console.log(returnObject, 'got back to send to weather client');
+
+      for (let i=0; i<dataToSend.datetime.length; i++){
+        returnObject.push({'date':dataToSend.datetime[i],'description':`Low of ${dataToSend.lowTemp[i]}, high of ${dataToSend.maxTemp[i]} with ${dataToSend.description[i]}`});
+        console.log(returnObject, 'got back to send to weather client');
+      }
       //   [
       //     {
       //       "description": "Low of 17.1, high of 23.6 with broken clouds",
@@ -85,11 +87,19 @@ app.get('*', (request, response)=>{
 class Forecast{
   constructor(weatherObject){
     console.log('did we get an object to construct?',weatherObject.data[0].weather);
-    this.cityName = weatherObject.city_name;
-    this.datetime = weatherObject.data[0].datetime;
-    this.description = weatherObject.data[0].weather.description;
-    this.lowTemp = weatherObject.data[0].low_temp;
-    this.maxTemp = weatherObject.data[0].max_temp;
+    this.datetime=[];
+    this.description=[];
+    this.lowTemp=[];
+    this.maxTemp=[];
+    for (let i=0; i<weatherObject.data.length; i++){
+
+      this.cityName = weatherObject.city_name;
+      this.datetime[i]= weatherObject.data[i].datetime;
+      this.description [i]= weatherObject.data[i].weather.description;
+      this.lowTemp[i] = weatherObject.data[i].low_temp;
+      this.maxTemp[i] = weatherObject.data[i].max_temp;
+    }
+
   }
 }
 

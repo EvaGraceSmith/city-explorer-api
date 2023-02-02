@@ -41,8 +41,7 @@ app.get('/weather', (request, response)=>{
 
     // let dataToSend = data.find(city => city.cityname === cityName);
     console.log('did we find city name?', cityName, cityLat,cityLon);
-    let dataToInstantiate = data.find(city => city.city_name === cityName); //&&
-    // city.citylat === cityLat && city.citylon === cityLon );
+    let dataToInstantiate = data.find(city => city.city_name === cityName); //&& city.lat === cityLat && city.lon === cityLon );
     if (dataToInstantiate === undefined){
       response.status(500).send('City not found');
     }

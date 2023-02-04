@@ -3,15 +3,16 @@
 console.log('Hello from our SERVER PORT!!!!!', process.env.PORT);
 
 
-const express = require('express');
 require('dotenv').config();
-let data = require('./data/weather.json');
+const express = require('express');
+// let data = require('./data/weather.json');
 const cors = require('cors');
-
-
+const axios =require('axios').default;
 const app = express();
 app.use(cors());
 const PORT = process.env.PORT;
+const weatherKey = process.env.WEATHER_API_KEY;
+
 
 
 app.get('/', (request, response)=>{
@@ -30,8 +31,8 @@ app.get('/hello',(request, response)=>{
   response.status(200).send(`Hello, ${firstName} ${lastName}`);
 });
 
-
-app.get('/weather', (request, response)=>{
+//access the weather and get the query parameters
+app.get('/weather', async(request, response)=>{
   //http://localhost3003/weather?cityname=Seattle&&citylon="-122.33207"&&citylat="47.60621"
   try{
     let cityName = request.query.cityname.toLowerCase();
@@ -41,12 +42,23 @@ app.get('/weather', (request, response)=>{
 
     // let dataToSend = data.find(city => city.cityname === cityName);
     console.log('did we find city name?', cityName, cityLat,cityLon);
-    let dataToInstantiate = data.find(city => city.city_name.toLowerCase() === cityName.toLowerCase()); //&& city.lat === cityLat && city.lon === cityLon );
-    if (dataToInstantiate === undefined){
+    // let dataToInstantiate = data.find(city => city.city_name.toLowerCase() === cityName.toLowerCase()); //&& city.lat === cityLat && city.lon === cityLon );
+ 
+    let needApiWeather = await axios.get (`https://api.weatherbit.io/v2.0/forecast/daily`,
+      {params:{
+        // city:cityName,
+        key: weatherKey,
+        lat: cityLat,
+        lon: cityLon,
+      }});
+
+    console.log('need weather', needApiWeather);
+
+    if (needApiWeather === undefined){
       response.status(500).send('City not found');
     }
     else{
-      let dataToSend = new Forecast(dataToInstantiate);
+      let dataToSend = new Forecast(needApiWeather);
       console.log(dataToSend, 'got back from weather class');
       let returnObject= [];
 
@@ -54,17 +66,7 @@ app.get('/weather', (request, response)=>{
         returnObject.push({'date':dataToSend.datetime[i],'description':`Low of ${dataToSend.lowTemp[i]}, high of ${dataToSend.maxTemp[i]} with ${dataToSend.description[i]}`});
         console.log(returnObject, 'got back to send to weather client');
       }
-      //   [
-      //     {
-      //       "description": "Low of 17.1, high of 23.6 with broken clouds",
-      //       "date": "2021-03-31"
-      //     },
-      //     {
-      //       "description": "Low of 17.5, high of 29.9 with few clouds",
-      //       "date": "2021-04-01"
-      //     },
-      //     ...
-      //   ]
+
       response.status(200).send(returnObject);
     }
 

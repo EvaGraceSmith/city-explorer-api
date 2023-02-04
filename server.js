@@ -34,14 +34,14 @@ app.get('/hello',(request, response)=>{
 app.get('/weather', (request, response)=>{
   //http://localhost3003/weather?cityname=Seattle&&citylon="-122.33207"&&citylat="47.60621"
   try{
-    let cityName = request.query.cityname;
+    let cityName = request.query.cityname.toLowerCase();
     let cityLat = request.query.citylat;
     let cityLon = request.query.citylon;
 
 
     // let dataToSend = data.find(city => city.cityname === cityName);
     console.log('did we find city name?', cityName, cityLat,cityLon);
-    let dataToInstantiate = data.find(city => city.city_name === cityName); //&& city.lat === cityLat && city.lon === cityLon );
+    let dataToInstantiate = data.find(city => city.city_name.toLowerCase() === cityName.toLowerCase()); //&& city.lat === cityLat && city.lon === cityLon );
     if (dataToInstantiate === undefined){
       response.status(500).send('City not found');
     }

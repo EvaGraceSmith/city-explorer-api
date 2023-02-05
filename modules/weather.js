@@ -1,7 +1,6 @@
 'use strict';
 
-// const Movies = {};
-const movieKey = process.env.MOVIE_API_KEY;
+
 const axios = require('axios').default;
 const weatherKey = process.env.WEATHER_API_KEY;
 

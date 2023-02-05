@@ -1,6 +1,6 @@
 'use strict';
 // npm start for proof of life
-console.log('Hello from our SERVER PORT!!!!!', process.env.PORT);
+
 
 
 require('dotenv').config();
@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 const PORT = process.env.PORT;
 const weatherKey = process.env.WEATHER_API_KEY;
-
+console.log('Hello from our SERVER PORT!!!!!', process.env.PORT);
 
 
 app.get('/', (request, response)=>{
@@ -43,14 +43,14 @@ app.get('/weather', async(request, response)=>{
     // let dataToSend = data.find(city => city.cityname === cityName);
     console.log('did we find city name?', cityName, cityLat,cityLon);
     // let dataToInstantiate = data.find(city => city.city_name.toLowerCase() === cityName.toLowerCase()); //&& city.lat === cityLat && city.lon === cityLon );
- 
+
     let needApiWeather = await axios.get (`https://api.weatherbit.io/v2.0/forecast/daily`,
       {params:{
-        // city:cityName,
         key: weatherKey,
         lat: cityLat,
         lon: cityLon,
-      }});
+      }}
+    );
 
     console.log('need weather', needApiWeather);
 
@@ -87,18 +87,18 @@ app.get('*', (request, response)=>{
 //class
 class Forecast{
   constructor(weatherObject){
-    console.log('did we get an object to construct?',weatherObject.data[0].weather);
+    console.log('did we get an object to construct?',weatherObject.data.data[0].weather);
     this.datetime=[];
     this.description=[];
     this.lowTemp=[];
     this.maxTemp=[];
-    for (let i=0; i<weatherObject.data.length; i++){
+    for (let i=0; i<weatherObject.data.data.length; i++){
 
-      this.cityName = weatherObject.city_name;
-      this.datetime[i]= weatherObject.data[i].datetime;
-      this.description [i]= weatherObject.data[i].weather.description;
-      this.lowTemp[i] = weatherObject.data[i].low_temp;
-      this.maxTemp[i] = weatherObject.data[i].max_temp;
+      this.cityName = weatherObject.data.city_name;
+      this.datetime[i]= weatherObject.data.data[i].datetime;
+      this.description [i]= weatherObject.data.data[i].weather.description;
+      this.lowTemp[i] = weatherObject.data.data[i].low_temp;
+      this.maxTemp[i] = weatherObject.data.data[i].max_temp;
     }
 
   }

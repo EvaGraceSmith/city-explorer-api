@@ -7,19 +7,23 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 app.use(cors());
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5005;
 const Weather = require('./modules/weather');
 const Movie = require('./modules/movie');
+const Yelp = require('./modules/yelp');
 console.log('Hello from our SERVER PORT!!!!!', process.env.PORT);
 
 
-app.get('/', (request, response)=>{response .send('Hello from our server HOME route/ !!');});
+app.get('/', (request, response)=>{response.send('Hello from our server HOME route/ !!');});
 
 //WEATHER
 app.get('/weather', Weather.weatherRequest);
 
 //MOVIE
 app.get('/movie', Movie.movieRequest);
+
+//YELP
+app.get('/yelp', Yelp.yelpRequest);
 
 //The order for these messages is important
 app.get('*', (request, response)=>{response.status(404).send('The route was not found. Error 404');});

@@ -1,10 +1,12 @@
 # city-explorer-api
-Backend for City Explorere
+Backend for City Explorer
+Please see City Explorer for more complete documentation.
+
 
 
 # Project Name
 
-**Author**: Your Name Goes Here
+**Author**: Eva Grace Smith
 **Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)
 
 ## Overview
@@ -24,6 +26,16 @@ Backend for City Explorere
 ## Credit and Collaborations
 <!-- Give credit (and a link) to other people or resources that helped you build this application. -->
 
+
+Name of feature: ___Componentizing of weather.js and movie.js_____________________________
+
+Estimate of time needed to complete: __1 hour___
+
+Start time: __4pm___
+
+Finish time: __5pm___
+
+Actual time needed to complete:  1hr_____
 
 Name of feature: ________________________________
 

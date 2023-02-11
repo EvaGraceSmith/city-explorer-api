@@ -5,7 +5,7 @@ const axios = require('axios').default;
 
 class Movie {
   constructor(movieObject) {
-    console.log('did we get an object to construct?', movieObject.data.results[0]);
+    // console.log('did we get an object to construct?', movieObject.data.results[0]);
     this.title = [];
     this.overview = [];
 

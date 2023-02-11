@@ -3,7 +3,14 @@
 
 const axios = require('axios').default;
 const weatherKey = process.env.WEATHER_API_KEY;
-
+// const Cache = require('./cache.js');
+let cache = {};
+let acceptableTimeToCache = 1000 * 60 * 60 * 24;
+console.log(acceptableTimeToCache);
+let testTimeToCache = 1000 * 10;
+//about ten seconds
+console.log(testTimeToCache);
+console.log('empty',cache);
 //class
 class Weather {
   constructor(weatherObject) {
@@ -28,38 +35,51 @@ Weather.weatherRequest = async (request, response) => {
   try {
     let cityLat = request.query.citylat;
     let cityLon = request.query.citylon;
+    let cityName = request.query.cityname.toLowerCase();
+    console.log('did we find city name?', cityName);
+    let returnArrayofObjects = [];
 
-    // let dataToSend = data.find(city => city.cityname === cityName);
-    console.log('did we find city lat/lon?', cityLat, cityLon);
-    // let dataToInstantiate = data.find(city => city.city_name.toLowerCase() === cityName.toLowerCase()); //&& city.lat === cityLat && city.lon === cityLon );
+    let key = cityName + '-Data';
 
-    let needApiWeather = await axios.get(`https://api.weatherbit.io/v2.0/forecast/daily`,
-      {
-        params: {
-          key: weatherKey,
-          lat: cityLat,
-          lon: cityLon,
-        }
-      }
-    );
-
-    // console.log('need weather', needApiWeather);
-
-    if (needApiWeather === undefined) {
-      response.status(500).send('City not found');
+    if(cache[key] &&( Date.now() - cache[key].timeStamp) < acceptableTimeToCache){
+      //if it is already in cache give them that data from the cache.
+      console.log([key], ' is in the cache already');
+      returnArrayofObjects = cache[key].data;
     }
+
     else {
-      let dataToSend = new Weather(needApiWeather);
-      // console.log(dataToSend, 'got back from weather class');
-      let returnObject = [];
+      let needApiWeather = await axios.get(`https://api.weatherbit.io/v2.0/forecast/daily`,
+        {
+          params: {
+            key: weatherKey,
+            lat: cityLat,
+            lon: cityLon,
+          }
+        }
+      );
 
-      for (let i = 0; i < dataToSend.datetime.length; i++) {
-        returnObject.push({ 'date': dataToSend.datetime[i], 'description': `Low of ${dataToSend.lowTemp[i]}, high of ${dataToSend.maxTemp[i]} with ${dataToSend.description[i]}` });
-        // console.log(returnObject, 'got back to send to weather client');
+      // console.log('need weather', needApiWeather);
+
+      if (needApiWeather === undefined) {
+        response.status(500).send('City not found');
       }
+      else {
+        let weatherdataToSend = new Weather(needApiWeather);
+        // console.log(dataToSend, 'got back from weather class');
 
-      response.status(200).send(returnObject);
+
+        for (let i = 0; i < weatherdataToSend.datetime.length; i++) {
+          returnArrayofObjects.push({ 'date': weatherdataToSend.datetime[i], 'description': `Low of ${weatherdataToSend.lowTemp[i]}, high of ${weatherdataToSend.maxTemp[i]} with ${weatherdataToSend.description[i]}` });
+        // console.log(returnObject, 'got back to send to weather client');
+        }
+        console.log('add to cache ' + key);
+        cache[key] = {
+          data: returnArrayofObjects,
+          timeStamp: Date.now()
+        };
+      }
     }
+    response.status(200).send(returnArrayofObjects);
 
   } catch (error) {
     //create a new instance of error

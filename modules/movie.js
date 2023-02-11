@@ -1,7 +1,16 @@
 'use strict';
 
+
 const movieKey = process.env.MOVIE_API_KEY;
 const axios = require('axios').default;
+// const Cache = require('./cache.js');
+let movieCache = {};
+let acceptableTimeToCache = 1000 * 60 * 60 * 24;
+console.log(acceptableTimeToCache);
+let testTimeToCache = 1000 * 10;
+//about ten seconds
+console.log(testTimeToCache);
+console.log('empty',movieCache);
 
 class Movie {
   constructor(movieObject) {
@@ -22,38 +31,54 @@ Movie.movieRequest = async (request, response) => {
     let cityName = request.query.cityname.toLowerCase();
 
     console.log('did we find city name?', cityName);
+    let returnObject = [];
 
+    let key = cityName + '-Data';
 
-    let needApiMovie = await axios.get(`https://api.themoviedb.org/3/search/movie`,
-      {
-        params: {
-          api_key: movieKey,
-          query: cityName,
-        }
-      }
-    );
+    if(movieCache[key] &&( Date.now() - movieCache[key].timeStamp) < acceptableTimeToCache){
+      //if it is already in cache give them that data from the cache.
+      console.log([key], ' is in the cache already');
+      returnObject = movieCache[key].data;
+    }
+
 
     // console.log('need movie', needApiMovie);
 
-    if (needApiMovie === undefined) {
-      response.status(500).send('City not found');
-    }
-    else {
-      let dataToSend = new Movie(needApiMovie);
-      // console.log(dataToSend, 'got back from movie class');
-      let returnObject = [];
 
-      for (let i = 0; i < dataToSend.title.length; i++) {
-        returnObject.push(
-          {
-            'title': `${dataToSend.title[i]}`,
-            'overview': `${dataToSend.overview[i]}`
-          });
-        // console.log(returnObject, 'got back to send to movie client');
+    else {
+      let needApiMovie = await axios.get(`https://api.themoviedb.org/3/search/movie`,
+        {
+          params: {
+            api_key: movieKey,
+            query: cityName,
+          }
+        }
+      );
+      if (needApiMovie === undefined) {
+        response.status(500).send('City not found');
       }
 
-      response.status(200).send(returnObject);
+      else{
+        let dataToSend = new Movie(needApiMovie);
+        // console.log(dataToSend, 'got back from movie class');
+
+
+        for (let i = 0; i < dataToSend.title.length; i++) {
+          returnObject.push(
+            {
+              'title': `${dataToSend.title[i]}`,
+              'overview': `${dataToSend.overview[i]}`
+            });
+        // console.log(returnObject, 'got back to send to movie client');
+        }
+        console.log('add to cache ' + key);
+        movieCache[key] = {
+          data: returnObject,
+          timeStamp: Date.now()
+        };
+      }
     }
+    response.status(200).send(returnObject);
     //create a new instance of error
     // this will instantiate any new error
   } catch (error) {

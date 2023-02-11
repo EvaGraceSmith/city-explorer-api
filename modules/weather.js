@@ -37,18 +37,13 @@ Weather.weatherRequest = async (request, response) => {
     let cityLon = request.query.citylon;
     let cityName = request.query.cityname.toLowerCase();
     console.log('did we find city name?', cityName);
-
-    // let dataToSend = data.find(city => city.cityname === cityName);
-    console.log('did we find city lat/lon?', cityLat, cityLon);
-    // let dataToInstantiate = data.find(city => city.city_name.toLowerCase() === cityName.toLowerCase()); //&& city.lat === cityLat && city.lon === cityLon );
-    console.log('Go find weather for ?', cityName);
     let returnArrayofObjects = [];
 
     let key = cityName + '-Data';
 
     if(cache[key] &&( Date.now() - cache[key].timeStamp) < acceptableTimeToCache){
       //if it is already in cache give them that data from the cache.
-      console.log(cache[key], ' is in the cache already');
+      console.log([key], ' is in the cache already');
       returnArrayofObjects = cache[key].data;
     }
 
@@ -83,8 +78,8 @@ Weather.weatherRequest = async (request, response) => {
           timeStamp: Date.now()
         };
       }
-      response.status(200).send(returnArrayofObjects);
     }
+    response.status(200).send(returnArrayofObjects);
 
   } catch (error) {
     //create a new instance of error
